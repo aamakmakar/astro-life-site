@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Астролог Макаренко — Персональный Прогноз</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --gold:        #c8a55a;
+      --gold-light:  #e8c97a;
+      --gold-pale:   #f5e4b0;
+      --gold-dim:    rgba(200,165,90,0.15);
+      --gold-border: rgba(200,165,90,0.28);
+      --gold-glow:   rgba(200,165,90,0.45);
+      --ink:         #07070f;
+      --glass:       rgba(10,10,28,0.62);
+      --text:        #ede5d0;
+      --text-dim:    rgba(237,229,208,0.55);
+      --text-faint:  rgba(237,229,208,0.32);
+      --accent-rose: #c07080;
+      --accent-teal: #5bbcaa;
+      --r-card: 24px;
+      --r-input: 14px;
+      --font-title: 'Cinzel', serif;
+      --font-body:  'Cormorant Garamond', serif;
+      --font-read:  'Lora', 'Georgia', serif;
+      --ease: cubic-bezier(0.22,1,0.36,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      background: var(--ink);
+      font-family: var(--font-body);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── BACKGROUND ── */
+    #cosmos { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .nebula {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 55% at 8% 12%,  rgba(90,60,160,0.30) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 45% at 92% 80%, rgba(30,90,155,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 35% at 55% 40%, rgba(155,85,45,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 90% 80% at 50% 60%, rgba(7,7,15,0.55)    0%, transparent 100%);
+    }
+
+    /* Shooting stars */
+    .shoot {
+      position: fixed; z-index: 2; pointer-events: none;
+      width: 1.5px; height: 90px;
+      background: linear-gradient(to bottom, transparent, rgba(220,185,100,0.9), transparent);
+      border-radius: 50%;
+      animation: shoot 9s linear infinite;
+      opacity: 0;
+    }
+    .s1 { top: 5%;  left: 15%; animation-delay: 2s;  animation-duration: 8s; }
+    .s2 { top: 10%; left: 60%; animation-delay: 14s; animation-duration: 7s; }
+    .s3 { top: 2%;  left: 40%; animation-delay: 22s; animation-duration: 9s; }
+    @keyframes shoot {
+      0%   { transform: translate(0,0) rotate(38deg);         opacity: 0; }
+      4%   { opacity: 1; }
+      28%  { transform: translate(250px,200px) rotate(38deg); opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    /* ── PLANETS (SVG-based, detailed) ── */
+    .planet { position: fixed; pointer-events: none; z-index: 2; overflow: visible; }
+
+    /* Saturn — верхний правый */
+    .p1 { width: 220px; height: 220px; top: -65px; right: -65px; animation: orb1 18s ease-in-out infinite; }
+    /* Jupiter — левый низ */
+    .p2 { width: 120px; height: 120px; bottom: 7%; left: -30px; animation: orb2 22s ease-in-out infinite; }
+    /* Moon — правый средний */
+    .p3 { width: 60px; height: 60px; top: 37%; right: 5%; animation: orb3 13s ease-in-out infinite; }
+
+    @keyframes orb1 {
+      0%,100% { transform: translate(0,0) rotate(0deg); filter: drop-shadow(0 0 30px rgba(210,190,140,0.35)); }
+      33%     { transform: translate(-12px,18px) rotate(2deg); filter: drop-shadow(0 0 40px rgba(210,190,140,0.5)); }
+      66%     { transform: translate(8px,-8px) rotate(-1.5deg); filter: drop-shadow(0 0 25px rgba(210,190,140,0.3)); }
+    }
+    @keyframes orb2 {
+      0%,100% { transform: translate(0,0); filter: drop-shadow(0 0 22px rgba(200,140,80,0.4)); }
+      50%     { transform: translate(16px,-26px); filter: drop-shadow(0 0 32px rgba(200,140,80,0.55)); }
+    }
+    @keyframes orb3 {
+      0%,100% { transform: translate(0,0) scale(1); filter: drop-shadow(0 0 14px rgba(210,210,240,0.5)); }
+      50%     { transform: translate(-7px,11px) scale(1.08); filter: drop-shadow(0 0 22px rgba(210,210,240,0.7)); }
+    }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      position: relative; z-index: 10;
+      max-width: 800px; margin: 0 auto;
+      padding: 0 22px 100px;
+    }
+
+    /* ── HEADER ── */
+    .header { text-align: center; padding: 70px 0 54px; }
+
+    .sigil {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 76px; height: 76px; margin-bottom: 22px;
+    }
+    .sigil svg {
+      width: 100%; height: 100%;
+      filter: drop-shadow(0 0 14px rgba(200,165,90,.7)) drop-shadow(0 0 36px rgba(200,165,90,.3));
+      animation: sigil 5s ease-in-out infinite;
+    }
+    @keyframes sigil {
+      0%,100% { filter: drop-shadow(0 0 14px rgba(200,165,90,.7)) drop-shadow(0 0 30px rgba(200,165,90,.28)); }
+      50%     { filter: drop-shadow(0 0 22px rgba(200,165,90,1))  drop-shadow(0 0 64px rgba(200,165,90,.48)); }
+    }
+
+    .eyebrow {
+      font-family: var(--font-title);
+      font-size: .62rem; letter-spacing: .36em; text-transform: uppercase;
+      color: var(--gold); opacity: .72; margin-bottom: 13px;
+    }
+    .header h1 {
+      font-family: var(--font-title);
+      font-size: clamp(1.55rem,5.5vw,2.65rem);
+      font-weight: 600; color: var(--gold-pale);
+      letter-spacing: .04em; line-height: 1.24;
+      text-shadow: 0 0 44px rgba(200,165,90,.5), 0 2px 0 rgba(0,0,0,.6);
+      margin-bottom: 15px;
+    }
+    .header-sub {
+      font-size: 1.2rem; font-style: italic; font-weight: 300;
+      color: var(--text-dim); max-width: 420px; margin: 0 auto; line-height: 1.7;
+    }
+    .orn {
+      display: flex; align-items: center; gap: 14px;
+      max-width: 250px; margin: 26px auto 0;
+    }
+    .orn-line { flex:1; height:1px; background:linear-gradient(to right,transparent,var(--gold-border),transparent); }
+    .orn-sym  { color:var(--gold); font-size:.5rem; letter-spacing:6px; opacity:.65; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--glass);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--r-card);
+      padding: 40px 36px;
+      backdrop-filter: blur(26px) saturate(145%);
+      -webkit-backdrop-filter: blur(26px) saturate(145%);
+      box-shadow:
+        inset 0 1.5px 0 rgba(255,255,255,0.045),
+        inset 0 -1px 0 rgba(200,165,90,0.06),
+        0 22px 65px rgba(0,0,0,0.58),
+        0 0 0 1px rgba(200,165,90,0.055);
+      margin-bottom: 24px; position: relative; overflow: hidden;
+    }
+    .card::before {
+      content:''; position:absolute; top:0; left:0;
+      width:130px; height:130px;
+      background:radial-gradient(circle at 0% 0%, rgba(200,165,90,0.07),transparent 70%);
+      pointer-events:none;
+    }
+    .card-anim { animation: rise .7s var(--ease) both; }
+    @keyframes rise { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+
+    .card-label {
+      font-family: var(--font-title);
+      font-size: .58rem; letter-spacing: .28em; text-transform: uppercase;
+      color: var(--gold); opacity: .8;
+      margin-bottom: 26px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .card-label::after {
+      content:''; flex:1; height:1px;
+      background:linear-gradient(to right,var(--gold-dim),transparent);
+    }
+
+    /* ── FORM GRID ── */
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 18px; margin-bottom: 28px;
+    }
+    @media(max-width:540px) {
+      .form-grid { grid-template-columns:1fr; }
+      .card { padding:26px 18px; }
+      .wrap { padding:0 14px 80px; }
+    }
+
+    .field { display:flex; flex-direction:column; gap:7px; }
+    .field.span2 { grid-column:1/-1; }
+
+    .field-label {
+      font-family: var(--font-title);
+      font-size: .57rem; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--gold); opacity: .74;
+    }
+
+    input[type="date"],
+    input[type="time"] {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--r-input);
+      color: var(--text);
+      font-family: var(--font-body); font-size: 1.05rem;
+      padding: 12px 16px; outline: none; width: 100%;
+      -webkit-appearance: none; appearance: none;
+      transition: border-color .3s, box-shadow .3s, background .3s;
+    }
+    input[type="date"]:focus,
+    input[type="time"]:focus {
+      border-color: var(--gold);
+      background: rgba(200,165,90,0.06);
+      box-shadow: 0 0 0 3px rgba(200,165,90,0.12);
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: brightness(.6) sepia(1) saturate(4) hue-rotate(-5deg); cursor:pointer;
+    }
+
+    /* City search */
+    .city-wrap { position: relative; }
+    .city-box {
+      display: flex; align-items: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--gold-border);
+      border-radius: var(--r-input);
+      transition: border-color .3s, box-shadow .3s, background .3s;
+    }
+    .city-box:focus-within {
+      border-color: var(--gold);
+      background: rgba(200,165,90,0.06);
+      box-shadow: 0 0 0 3px rgba(200,165,90,0.12);
+    }
+    .city-flag-sel { padding: 0 10px 0 14px; font-size:1.1rem; pointer-events:none; }
+    .city-box input {
+      flex:1; background:transparent; border:none; outline:none;
+      color:var(--text); font-family:var(--font-body); font-size:1.05rem;
+      padding:12px 14px 12px 0; caret-color:var(--gold);
+    }
+    .city-box input::placeholder { color:var(--text-faint); }
+
+    .city-drop {
+      position:absolute; top:calc(100% + 6px); left:0; right:0;
+      background:#10102a; border:1px solid var(--gold-border);
+      border-radius:14px; overflow:hidden; z-index:100;
+      max-height:240px; overflow-y:auto; display:none;
+      box-shadow:0 14px 45px rgba(0,0,0,0.72);
+      scrollbar-width:thin; scrollbar-color:var(--gold-dim) transparent;
+    }
+    .city-drop.open { display:block; }
+    .city-opt {
+      padding:11px 18px; cursor:pointer;
+      font-family:var(--font-body); font-size:1rem; color:var(--text);
+      display:flex; align-items:center; gap:12px;
+      border-bottom:1px solid rgba(200,165,90,0.07);
+      transition:background .16s;
+    }
+    .city-opt:last-child { border-bottom:none; }
+    .city-opt:hover, .city-opt.hl { background:rgba(200,165,90,0.1); }
+    .city-opt .cf { font-size:1.15rem; }
+    .city-opt .cn { flex:1; }
+    .city-opt .ct { font-size:.82rem; color:var(--text-dim); font-style:italic; }
+
+    .coord-badge {
+      margin-top:7px; font-size:.8rem;
+      color:var(--text-dim); font-style:italic; min-height:1.2em; padding-left:2px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px; border:none; cursor:pointer;
+      font-family:var(--font-title); letter-spacing:.1em; text-transform:uppercase;
+      text-decoration:none; border-radius:60px; transition:all .35s var(--ease);
+    }
+    .btn-primary {
+      width:100%; padding:17px 36px; font-size:.7rem; font-weight:700;
+      background:linear-gradient(135deg,#d8aa45 0%,#b87818 45%,#d8aa45 100%);
+      background-size:200% 100%; color:#09070000;
+      /* текст темный */
+      color:rgba(10,7,0,0.88);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18),
+                  0 6px 32px rgba(200,165,90,.4),
+                  0 2px 8px rgba(0,0,0,.4);
+    }
+    .btn-primary:hover {
+      background-position:right center;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.2), 0 8px 48px rgba(200,165,90,.62), 0 2px 10px rgba(0,0,0,.5);
+      transform:translateY(-2px);
+    }
+    .btn-primary:active { transform:translateY(0); }
+
+    .btn-tg {
+      width:100%; padding:16px 36px; font-size:.7rem; font-weight:700;
+      background:linear-gradient(135deg,#2aaae0,#0077b6); color:#fff;
+      box-shadow:0 6px 30px rgba(42,170,224,.35);
+    }
+    .btn-tg:hover { transform:translateY(-2px); box-shadow:0 8px 44px rgba(42,170,224,.55); }
+
+    .btn-reveal {
+      width:100%; padding:16px 36px; font-size:.7rem; font-weight:700;
+      margin-top:18px;
+      background:linear-gradient(135deg,#7050c8,#4428a0); color:#fff;
+      box-shadow:0 6px 26px rgba(112,80,200,.3);
+      opacity:.36; cursor:not-allowed;
+    }
+    .btn-reveal.active { opacity:1; cursor:pointer; }
+    .btn-reveal.active:hover { transform:translateY(-2px); box-shadow:0 8px 42px rgba(112,80,200,.58); }
+
+    /* ── GATE ── */
+    .gate { display:none; text-align:center; }
+    .gate.open { display:block; }
+
+    .tg-icon-wrap {
+      width:80px; height:80px; border-radius:50%; margin:0 auto 20px;
+      background:radial-gradient(circle,rgba(42,170,224,.18),rgba(42,170,224,.05));
+      border:1px solid rgba(42,170,224,.28);
+      display:flex; align-items:center; justify-content:center;
+      font-size:2rem; box-shadow:0 0 44px rgba(42,170,224,.18);
+    }
+    .gate h2 {
+      font-family:var(--font-title); font-size:clamp(.95rem,3vw,1.15rem);
+      color:var(--gold-pale); line-height:1.5; margin-bottom:10px;
+    }
+    .gate p {
+      color:var(--text-dim); font-size:1rem; font-style:italic; font-weight:300;
+      max-width:380px; margin:0 auto 26px; line-height:1.7;
+    }
+
+    .check-row {
+      display:flex; align-items:center; gap:12px; justify-content:center;
+      margin:22px 0 6px; cursor:pointer;
+    }
+    .check-row input { width:20px; height:20px; accent-color:var(--gold); cursor:pointer; }
+    .check-row span  { font-size:1.05rem; color:var(--text); }
+
+    .hint {
+      font-size:.82rem; color:var(--gold); font-style:italic;
+      min-height:1.2em; opacity:0; transition:opacity .3s; text-align:center;
+    }
+    .hint.show { opacity:1; }
+
+    /* ── RESULT ── */
+    .result { display:none; }
+    .result.show { display:block; }
+
+    /* Заголовок транзитов */
+    .transit-hd { text-align:center; margin-bottom:28px; }
+    .transit-ey {
+      font-family: var(--font-title);
+      font-size: .58rem; letter-spacing: .32em; text-transform: uppercase;
+      color: var(--gold); opacity: .72; margin-bottom: 14px;
+    }
+    .transit-hl {
+      font-family: var(--font-title);
+      font-size: clamp(1.05rem, 3.5vw, 1.45rem);
+      color: var(--gold-pale); line-height: 1.55; font-weight: 600;
+      text-shadow: 0 0 30px rgba(200,165,90,.35);
+      letter-spacing: .02em;
+    }
+    .transit-hl em { font-style: italic; color: var(--gold-light); }
+
+    /* Бейджи */
+    .badges {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: center; margin: 20px 0 30px;
+    }
+    .badge {
+      padding: 8px 22px; border-radius: 60px;
+      font-family: var(--font-title); font-size: .58rem;
+      letter-spacing: .12em; text-transform: uppercase; font-weight: 600;
+    }
+    .b-sun  { border:1px solid rgba(230,170,40,.5); background:rgba(230,170,40,.08); color:#f0c840; box-shadow:0 0 22px rgba(230,170,40,.14); }
+    .b-moon { border:1px solid rgba(180,200,240,.4); background:rgba(180,200,240,.07); color:#c0d4f8; box-shadow:0 0 22px rgba(180,200,240,.12); }
+    .b-city { border:1px solid rgba(91,188,170,.35); background:rgba(91,188,170,.07); color:var(--accent-teal); }
+
+    /* Подзаголовок знака */
+    .sign-hd {
+      font-family: var(--font-title);
+      font-size: clamp(.88rem, 2.5vw, 1.05rem);
+      font-weight: 600; letter-spacing: .03em;
+      color: var(--gold-pale); margin-bottom: 26px; padding-bottom: 18px;
+      border-bottom: 1px solid var(--gold-dim);
+    }
+
+    /* Заголовки секций */
+    .sec-title {
+      font-family: var(--font-title);
+      font-size: .6rem; letter-spacing: .25em;
+      text-transform: uppercase; margin-bottom: 16px;
+      font-weight: 600;
+    }
+    .t-pros { color: var(--accent-teal); }
+    .t-cons { color: var(--accent-rose); }
+    .t-caut { color: #d4a84a; }
+    .t-act  { color: var(--gold-light); }
+
+    /* Пункты списка — Lora: максимальная читаемость */
+    .items { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .items li {
+      font-family: var(--font-read);          /* Lora — оптимальна для чтения */
+      font-size: 1.08rem;
+      line-height: 1.75;
+      font-weight: 400;
+      color: rgba(237,229,208,0.92);
+      padding: 13px 18px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.025);
+      border-left: 2px solid rgba(200,165,90,0.22);
+      transition: background .2s, border-color .2s;
+    }
+    .items li:hover {
+      background: rgba(200,165,90,0.055);
+      border-left-color: rgba(200,165,90,0.5);
+    }
+
+    /* Разделитель */
+    .hr {
+      height: 1px; margin: 28px 0;
+      background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+    }
+
+    /* Фраза-настрой */
+    .mood {
+      text-align: center; padding: 26px 30px; border-radius: 18px;
+      border: 1px solid var(--gold-border);
+      background: linear-gradient(135deg, rgba(200,165,90,0.08), rgba(200,165,90,0.02));
+      font-family: var(--font-read);          /* Lora italic */
+      font-size: 1.18rem; font-style: italic; font-weight: 500;
+      color: var(--gold-light); line-height: 1.7;
+      text-shadow: 0 0 24px rgba(200,165,90,0.22);
+      letter-spacing: .01em;
+    }
+
+    /* Дисклеймер */
+    .disc {
+      margin-top: 24px;
+      font-family: var(--font-read);
+      font-size: .88rem; font-style: italic; font-weight: 400;
+      color: var(--text-faint); text-align: center; line-height: 1.8;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align:center; padding:44px 0 20px;
+      font-size:.85rem; color:var(--text-faint); font-style:italic;
+    }
+    .footer a { color:var(--gold); text-decoration:none; opacity:.78; }
+    .footer a:hover { opacity:1; }
+
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--ink); }
+    ::-webkit-scrollbar-thumb { background:var(--gold-dim); border-radius:3px; }
+  </style>
+</head>
+<body>
+
+<canvas id="cosmos"></canvas>
+<div class="nebula"></div>
+<div class="shoot s1"></div>
+<div class="shoot s2"></div>
+<div class="shoot s3"></div>
+<!-- ══ SATURN ══ realistic CSS/SVG gradient with rings -->
+<svg class="planet p1" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- Сатурн: тело — бежево-золотистый с полосами -->
+    <radialGradient id="sat-body" cx="40%" cy="35%" r="60%">
+      <stop offset="0%"   stop-color="#f0e0b0"/>
+      <stop offset="18%"  stop-color="#d4b870"/>
+      <stop offset="40%"  stop-color="#c8a050"/>
+      <stop offset="65%"  stop-color="#a07830"/>
+      <stop offset="85%"  stop-color="#704818"/>
+      <stop offset="100%" stop-color="#2a1808"/>
+    </radialGradient>
+    <!-- горизонтальные полосы Сатурна через linearGradient -->
+    <linearGradient id="sat-bands" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(255,240,180,0.0)"/>
+      <stop offset="12%"  stop-color="rgba(200,160,80,0.25)"/>
+      <stop offset="20%"  stop-color="rgba(255,220,140,0.12)"/>
+      <stop offset="30%"  stop-color="rgba(160,110,40,0.28)"/>
+      <stop offset="40%"  stop-color="rgba(220,185,110,0.15)"/>
+      <stop offset="50%"  stop-color="rgba(140,90,30,0.30)"/>
+      <stop offset="60%"  stop-color="rgba(200,160,80,0.18)"/>
+      <stop offset="72%"  stop-color="rgba(120,75,20,0.28)"/>
+      <stop offset="82%"  stop-color="rgba(180,140,70,0.15)"/>
+      <stop offset="100%" stop-color="rgba(80,40,10,0.20)"/>
+    </linearGradient>
+    <!-- тень на теле планеты (правая сторона темнее) -->
+    <radialGradient id="sat-shadow" cx="70%" cy="60%" r="55%">
+      <stop offset="0%"   stop-color="rgba(0,0,0,0.0)"/>
+      <stop offset="60%"  stop-color="rgba(0,0,0,0.35)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.72)"/>
+    </radialGradient>
+    <!-- блик -->
+    <radialGradient id="sat-spec" cx="33%" cy="28%" r="30%">
+      <stop offset="0%"   stop-color="rgba(255,250,230,0.55)"/>
+      <stop offset="100%" stop-color="rgba(255,250,230,0.0)"/>
+    </radialGradient>
+    <!-- кольцо A (внешнее) -->
+    <linearGradient id="ring-a" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(210,190,140,0.0)"/>
+      <stop offset="30%"  stop-color="rgba(210,190,140,0.55)"/>
+      <stop offset="50%"  stop-color="rgba(230,210,160,0.70)"/>
+      <stop offset="70%"  stop-color="rgba(200,175,120,0.50)"/>
+      <stop offset="100%" stop-color="rgba(210,190,140,0.0)"/>
+    </linearGradient>
+    <!-- кольцо B (средний яркий) -->
+    <linearGradient id="ring-b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(240,220,170,0.0)"/>
+      <stop offset="25%"  stop-color="rgba(240,220,170,0.65)"/>
+      <stop offset="50%"  stop-color="rgba(255,240,200,0.85)"/>
+      <stop offset="75%"  stop-color="rgba(220,200,150,0.60)"/>
+      <stop offset="100%" stop-color="rgba(240,220,170,0.0)"/>
+    </linearGradient>
+    <!-- кольцо C (внутреннее, полупрозрачное) -->
+    <linearGradient id="ring-c" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(180,160,100,0.0)"/>
+      <stop offset="50%"  stop-color="rgba(180,160,100,0.35)"/>
+      <stop offset="100%" stop-color="rgba(180,160,100,0.0)"/>
+    </linearGradient>
+    <clipPath id="sat-clip">
+      <circle cx="110" cy="100" r="72"/>
+    </clipPath>
+    <!-- тень колец на планете -->
+    <linearGradient id="ring-shadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(20,10,0,0.0)"/>
+      <stop offset="50%"  stop-color="rgba(20,10,0,0.30)"/>
+      <stop offset="100%" stop-color="rgba(20,10,0,0.0)"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Кольца ЗА планетой (нижняя половина) — clip нижней дуги -->
+  <g opacity="0.88">
+    <!-- Кольцо A back -->
+    <ellipse cx="110" cy="118" rx="115" ry="22" fill="none" stroke="url(#ring-a)" stroke-width="11"
+             clip-path="url(#ring-back-clip)"/>
+    <!-- Кольцо B back -->
+    <ellipse cx="110" cy="118" rx="92" ry="17.5" fill="none" stroke="url(#ring-b)" stroke-width="8"
+             clip-path="url(#ring-back-clip)"/>
+    <!-- Кольцо C back -->
+    <ellipse cx="110" cy="118" rx="74" ry="14" fill="none" stroke="url(#ring-c)" stroke-width="5"
+             clip-path="url(#ring-back-clip)"/>
+  </g>
+
+  <!-- Тело планеты -->
+  <circle cx="110" cy="100" r="72" fill="url(#sat-body)"/>
+  <!-- Полосы поверх тела -->
+  <circle cx="110" cy="100" r="72" fill="url(#sat-bands)"/>
+  <!-- Теневая сторона -->
+  <circle cx="110" cy="100" r="72" fill="url(#sat-shadow)"/>
+  <!-- Блик -->
+  <circle cx="110" cy="100" r="72" fill="url(#sat-spec)"/>
+  <!-- Тень от колец на поверхности -->
+  <ellipse cx="110" cy="100" rx="72" ry="18" fill="url(#ring-shadow)" opacity="0.55"/>
+
+  <!-- Кольца ПЕРЕД планетой (верхняя половина) -->
+  <defs>
+    <clipPath id="ring-front-clip">
+      <rect x="0" y="0" width="220" height="118"/>
+    </clipPath>
+    <clipPath id="ring-back-clip">
+      <rect x="0" y="118" width="220" height="102"/>
+    </clipPath>
+  </defs>
+  <g opacity="0.92">
+    <!-- Кольцо A front -->
+    <ellipse cx="110" cy="118" rx="115" ry="22" fill="none" stroke="url(#ring-a)" stroke-width="11"
+             clip-path="url(#ring-front-clip)"/>
+    <!-- Кольцо B front -->
+    <ellipse cx="110" cy="118" rx="92" ry="17.5" fill="none" stroke="url(#ring-b)" stroke-width="8"
+             clip-path="url(#ring-front-clip)"/>
+    <!-- Кольцо C front -->
+    <ellipse cx="110" cy="118" rx="74" ry="14" fill="none" stroke="url(#ring-c)" stroke-width="5"
+             clip-path="url(#ring-front-clip)"/>
+  </g>
+</svg>
+
+<!-- ══ JUPITER ══ полосатый газовый гигант -->
+<svg class="planet p2" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="jup-base" cx="38%" cy="32%" r="62%">
+      <stop offset="0%"   stop-color="#f5ddb0"/>
+      <stop offset="25%"  stop-color="#e0b870"/>
+      <stop offset="55%"  stop-color="#c8905a"/>
+      <stop offset="80%"  stop-color="#9a5830"/>
+      <stop offset="100%" stop-color="#3a1808"/>
+    </radialGradient>
+    <!-- Характерные горизонтальные полосы Юпитера -->
+    <linearGradient id="jup-bands" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(250,235,200,0.08)"/>
+      <stop offset="7%"   stop-color="rgba(140,70,30,0.45)"/>   <!-- тёмная полоса NEB -->
+      <stop offset="13%"  stop-color="rgba(240,210,160,0.20)"/>
+      <stop offset="20%"  stop-color="rgba(190,110,50,0.50)"/>  <!-- NTB -->
+      <stop offset="27%"  stop-color="rgba(255,230,180,0.15)"/>
+      <stop offset="35%"  stop-color="rgba(160,80,30,0.55)"/>   <!-- NEB -->
+      <stop offset="43%"  stop-color="rgba(255,240,200,0.10)"/> <!-- EZ (Equatorial Zone) -->
+      <stop offset="50%"  stop-color="rgba(200,100,40,0.60)"/>  <!-- SEB — самая тёмная -->
+      <stop offset="57%"  stop-color="rgba(240,205,150,0.18)"/>
+      <stop offset="65%"  stop-color="rgba(170,90,40,0.48)"/>   <!-- STB -->
+      <stop offset="72%"  stop-color="rgba(230,200,155,0.15)"/>
+      <stop offset="80%"  stop-color="rgba(150,75,30,0.40)"/>
+      <stop offset="90%"  stop-color="rgba(200,160,100,0.20)"/>
+      <stop offset="100%" stop-color="rgba(80,35,10,0.30)"/>
+    </linearGradient>
+    <!-- Тень (правая и нижняя части темнее) -->
+    <radialGradient id="jup-shadow" cx="68%" cy="62%" r="52%">
+      <stop offset="0%"   stop-color="rgba(0,0,0,0.0)"/>
+      <stop offset="55%"  stop-color="rgba(0,0,0,0.32)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.75)"/>
+    </radialGradient>
+    <!-- Блик -->
+    <radialGradient id="jup-spec" cx="30%" cy="25%" r="28%">
+      <stop offset="0%"   stop-color="rgba(255,248,230,0.60)"/>
+      <stop offset="100%" stop-color="rgba(255,248,230,0.0)"/>
+    </radialGradient>
+    <!-- Большое красное пятно -->
+    <radialGradient id="grs" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#c04018"/>
+      <stop offset="40%"  stop-color="#a03010"/>
+      <stop offset="70%"  stop-color="#802010"/>
+      <stop offset="100%" stop-color="rgba(100,25,10,0.0)"/>
+    </radialGradient>
+    <clipPath id="jup-clip"><circle cx="60" cy="60" r="52"/></clipPath>
+  </defs>
+
+  <!-- Тело -->
+  <circle cx="60" cy="60" r="52" fill="url(#jup-base)"/>
+  <circle cx="60" cy="60" r="52" fill="url(#jup-bands)"/>
+  <!-- Большое красное пятно (GRS) — иконический элемент Юпитера -->
+  <ellipse cx="70" cy="62" rx="11" ry="7" fill="url(#grs)" clip-path="url(#jup-clip)" opacity="0.85"/>
+  <!-- Белый вихрь рядом с GRS -->
+  <ellipse cx="52" cy="58" rx="5" ry="3.5" fill="rgba(255,240,210,0.30)" clip-path="url(#jup-clip)"/>
+  <!-- Тень -->
+  <circle cx="60" cy="60" r="52" fill="url(#jup-shadow)"/>
+  <!-- Блик -->
+  <circle cx="60" cy="60" r="52" fill="url(#jup-spec)"/>
+  <!-- Атмосферное свечение -->
+  <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(230,180,100,0.18)" stroke-width="4"/>
+</svg>
+
+<!-- ══ MOON ══ детализированная Луна с кратерами -->
+<svg class="planet p3" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="moon-base" cx="40%" cy="35%" r="58%">
+      <stop offset="0%"   stop-color="#e8e0d0"/>
+      <stop offset="30%"  stop-color="#c8bfa8"/>
+      <stop offset="60%"  stop-color="#a09080"/>
+      <stop offset="85%"  stop-color="#706050"/>
+      <stop offset="100%" stop-color="#282018"/>
+    </radialGradient>
+    <!-- Море (Mare) — тёмные регионы -->
+    <radialGradient id="moon-mare1" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="rgba(60,50,40,0.55)"/>
+      <stop offset="100%" stop-color="rgba(60,50,40,0.0)"/>
+    </radialGradient>
+    <radialGradient id="moon-mare2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="rgba(50,42,34,0.45)"/>
+      <stop offset="100%" stop-color="rgba(50,42,34,0.0)"/>
+    </radialGradient>
+    <!-- Тень (фаза) -->
+    <radialGradient id="moon-shadow" cx="72%" cy="58%" r="50%">
+      <stop offset="0%"   stop-color="rgba(0,0,0,0.0)"/>
+      <stop offset="50%"  stop-color="rgba(0,0,0,0.28)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0.78)"/>
+    </radialGradient>
+    <!-- Блик -->
+    <radialGradient id="moon-spec" cx="33%" cy="28%" r="26%">
+      <stop offset="0%"   stop-color="rgba(255,252,245,0.65)"/>
+      <stop offset="100%" stop-color="rgba(255,252,245,0.0)"/>
+    </radialGradient>
+    <clipPath id="moon-clip"><circle cx="30" cy="30" r="26"/></clipPath>
+  </defs>
+
+  <!-- Тело Луны -->
+  <circle cx="30" cy="30" r="26" fill="url(#moon-base)"/>
+  <!-- Mare Imbrium (большое тёмное море, левый центр) -->
+  <ellipse cx="22" cy="26" rx="10" ry="8" fill="url(#moon-mare1)" clip-path="url(#moon-clip)" opacity="0.8"/>
+  <!-- Mare Tranquillitatis -->
+  <ellipse cx="34" cy="30" rx="7" ry="6" fill="url(#moon-mare2)" clip-path="url(#moon-clip)" opacity="0.65"/>
+  <!-- Mare Serenitatis -->
+  <ellipse cx="28" cy="20" rx="5" ry="4" fill="rgba(55,46,36,0.40)" clip-path="url(#moon-clip)"/>
+  <!-- Кратеры (белые с тенью) -->
+  <!-- Tycho — яркий кратер с лучами -->
+  <circle cx="25" cy="40" r="3.5" fill="rgba(200,195,185,0.7)" clip-path="url(#moon-clip)"/>
+  <circle cx="25" cy="40" r="2"   fill="rgba(230,225,215,0.5)" clip-path="url(#moon-clip)"/>
+  <!-- Маленькие кратеры -->
+  <circle cx="38" cy="22" r="2.2" fill="rgba(185,178,165,0.6)" clip-path="url(#moon-clip)"/>
+  <circle cx="38" cy="22" r="1.2" fill="rgba(210,205,195,0.4)" clip-path="url(#moon-clip)"/>
+  <circle cx="18" cy="34" r="1.8" fill="rgba(175,168,155,0.55)" clip-path="url(#moon-clip)"/>
+  <circle cx="34" cy="43" r="1.4" fill="rgba(180,174,162,0.50)" clip-path="url(#moon-clip)"/>
+  <circle cx="42" cy="35" r="1.2" fill="rgba(185,178,166,0.48)" clip-path="url(#moon-clip)"/>
+  <!-- Тень (ночная сторона) -->
+  <circle cx="30" cy="30" r="26" fill="url(#moon-shadow)"/>
+  <!-- Блик -->
+  <circle cx="30" cy="30" r="26" fill="url(#moon-spec)"/>
+  <!-- Лёгкий ореол атмосферы -->
+  <circle cx="30" cy="30" r="27.5" fill="none" stroke="rgba(220,215,200,0.15)" stroke-width="3"/>
+</svg>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="sigil">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="40" r="38" stroke="rgba(200,165,90,0.22)" stroke-width="1"/>
+        <circle cx="40" cy="40" r="30" stroke="rgba(200,165,90,0.1)" stroke-width=".5"/>
+        <path d="M40 8 L43.5 36.5 L72 40 L43.5 43.5 L40 72 L36.5 43.5 L8 40 L36.5 36.5 Z"
+              fill="url(#sg)" stroke="rgba(200,165,90,0.38)" stroke-width=".5"/>
+        <path d="M40 18 L41.5 38.5 L62 40 L41.5 41.5 L40 62 L38.5 41.5 L18 40 L38.5 38.5 Z"
+              fill="rgba(200,165,90,0.17)"/>
+        <circle cx="40" cy="40" r="4" fill="rgba(200,165,90,0.72)"/>
+        <defs>
+          <radialGradient id="sg" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"   stop-color="#f0d080" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#c8a55a" stop-opacity="0.25"/>
+          </radialGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="eyebrow">Астролог Макаренко</div>
+    <h1>Персональный<br>Небесный Прогноз</h1>
+    <p class="header-sub">Введи данные рождения — и узнай, что говорят звёзды прямо сейчас</p>
+    <div class="orn">
+      <div class="orn-line"></div>
+      <div class="orn-sym">✦ ✦ ✦</div>
+      <div class="orn-line"></div>
+    </div>
+  </header>
+
+  <!-- FORM -->
+  <div class="card card-anim">
+    <div class="card-label">✦ Ваши данные</div>
+    <div class="form-grid">
+
+      <div class="field">
+        <div class="field-label">Дата рождения</div>
+        <input type="date" id="birthdate" />
+      </div>
+
+      <div class="field">
+        <div class="field-label">Время рождения</div>
+        <input type="time" id="birthtime" value="12:00" />
+      </div>
+
+      <div class="field span2">
+        <div class="field-label">Город рождения</div>
+        <div class="city-wrap">
+          <div class="city-box">
+            <span class="city-flag-sel" id="sel-flag">🌍</span>
+            <input type="text" id="city-q" placeholder="Начни вводить название города…"
+                   autocomplete="off" spellcheck="false" />
+          </div>
+          <div class="city-drop" id="city-drop"></div>
+        </div>
+        <div class="coord-badge" id="coord-b"></div>
+        <input type="hidden" id="c-lat"  value="" />
+        <input type="hidden" id="c-lng"  value="" />
+        <input type="hidden" id="c-tz"   value="" />
+        <input type="hidden" id="c-name" value="" />
+      </div>
+
+    </div>
+    <button class="btn btn-primary" onclick="calculate()">✦ Рассчитать прогноз</button>
+  </div>
+
+  <!-- GATE -->
+  <div class="card gate" id="gate">
+    <div class="tg-icon-wrap">✈️</div>
+    <h2>Прогноз готов.<br>Осталось одно маленькое действие.<br>Подпишись на Telegram-канал автора и получи бесплатно.</h2>
+    <p>Вас ждёт только глубокая астрология, разборы кризисов, деньги и реальные точки роста. Стратегические сессии и консультации.</p>
+    <a class="btn btn-tg" href="https://t.me/astro_makarenko" target="_blank" rel="noopener">
+      Открыть @astro_makarenko
+    </a>
+    <label class="check-row">
+      <input type="checkbox" id="sub-c" onchange="onCheck()" />
+      <span>Я подписался(-ась) на канал</span>
+    </label>
+    <div class="hint" id="hint">☝ Отметь галочку, чтобы открыть прогноз</div>
+    <button class="btn btn-reveal" id="rev-btn" onclick="reveal()">Показать прогноз</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card result" id="result">
+
+    <div class="transit-hd">
+      <div class="transit-ey">Транзиты на сегодня</div>
+      <div class="transit-hl" id="t-hl"></div>
+    </div>
+
+    <div class="badges">
+      <span class="badge b-sun"  id="b-sun"></span>
+      <span class="badge b-moon" id="b-moon"></span>
+      <span class="badge b-city" id="b-city"></span>
+    </div>
+
+    <div class="hr"></div>
+    <div class="sign-hd" id="sign-hd"></div>
+
+    <div class="sec-title t-pros">🌿 Сила дня</div>
+    <ul class="items" id="pros"></ul>
+
+    <div class="hr"></div>
+    <div class="sec-title t-cons">🌑 Вызовы дня</div>
+    <ul class="items" id="cons"></ul>
+
+    <div class="hr"></div>
+    <div class="sec-title t-caut">⚠ Где осторожнее</div>
+    <ul class="items" id="caut"></ul>
+
+    <div class="hr"></div>
+    <div class="sec-title t-act">⭐ Лучшие действия</div>
+    <ul class="items" id="acts"></ul>
+
+    <div class="hr"></div>
+    <div class="mood" id="mood"></div>
+
+    <div class="disc">
+      ✦ Астрология — инструмент саморефлексии и работы над собой, а не система предсказаний.
+      Прогнозы носят рекомендательный характер и не заменяют профессиональных консультаций.<br><br>
+      Запись на консультацию: <a href="https://t.me/Amakcar" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(200,165,90,0.35);">https://t.me/Amakcar</a><br>
+      Специализация — Деньги, Отношения, Сложные периоды жизни.
+    </div>
+  </div>
+
+  <footer class="footer">
+    © 2026 Астролог Макаренко ·
+    <a href="https://t.me/astro_makarenko" target="_blank" rel="noopener">@astro_makarenko</a>
+  </footer>
+
+</div>
+
+<script>
+// ════════════════════════════════════════
+//  CITY DATABASE
+// ════════════════════════════════════════
+const CITIES = [
+  {n:"Москва",           f:"🇷🇺", lat:55.7558,  lng:37.6173,   tz:3   },
+  {n:"Санкт-Петербург",  f:"🇷🇺", lat:59.9343,  lng:30.3351,   tz:3   },
+  {n:"Новосибирск",      f:"🇷🇺", lat:54.9886,  lng:82.9290,   tz:7   },
+  {n:"Екатеринбург",     f:"🇷🇺", lat:56.8389,  lng:60.6057,   tz:5   },
+  {n:"Казань",           f:"🇷🇺", lat:55.7887,  lng:49.1221,   tz:3   },
+  {n:"Нижний Новгород",  f:"🇷🇺", lat:56.3269,  lng:44.0059,   tz:3   },
+  {n:"Краснодар",        f:"🇷🇺", lat:45.0448,  lng:38.9760,   tz:3   },
+  {n:"Ростов-на-Дону",   f:"🇷🇺", lat:47.2357,  lng:39.7015,   tz:3   },
+  {n:"Самара",           f:"🇷🇺", lat:53.2028,  lng:50.1408,   tz:4   },
+  {n:"Омск",             f:"🇷🇺", lat:54.9885,  lng:73.3242,   tz:6   },
+  {n:"Красноярск",       f:"🇷🇺", lat:56.0097,  lng:92.8520,   tz:7   },
+  {n:"Пермь",            f:"🇷🇺", lat:58.0105,  lng:56.2502,   tz:5   },
+  {n:"Уфа",              f:"🇷🇺", lat:54.7353,  lng:55.9587,   tz:5   },
+  {n:"Хабаровск",        f:"🇷🇺", lat:48.4827,  lng:135.084,   tz:10  },
+  {n:"Владивосток",      f:"🇷🇺", lat:43.1332,  lng:131.911,   tz:10  },
+  {n:"Иркутск",          f:"🇷🇺", lat:52.2855,  lng:104.289,   tz:8   },
+  {n:"Тюмень",           f:"🇷🇺", lat:57.1522,  lng:65.5272,   tz:5   },
+  {n:"Сочи",             f:"🇷🇺", lat:43.6028,  lng:39.7342,   tz:3   },
+  {n:"Воронеж",          f:"🇷🇺", lat:51.6720,  lng:39.1843,   tz:3   },
+  {n:"Челябинск",        f:"🇷🇺", lat:55.1644,  lng:61.4368,   tz:5   },
+  {n:"Волгоград",       f:"🇷🇺", lat:48.7080,  lng:44.5133,   tz:3   },
+  {n:"Саратов",          f:"🇷🇺", lat:51.5406,  lng:46.0086,   tz:3   },
+  {n:"Тольятти",         f:"🇷🇺", lat:53.5303,  lng:49.3461,   tz:4   },
+  {n:"Барнаул",          f:"🇷🇺", lat:53.3479,  lng:83.7798,   tz:7   },
+  {n:"Ульяновск",        f:"🇷🇺", lat:54.3282,  lng:48.3866,   tz:4   },
+  {n:"Ижевск",           f:"🇷🇺", lat:56.8527,  lng:53.2114,   tz:4   },
+  {n:"Махачкала",        f:"🇷🇺", lat:42.9849,  lng:47.5047,   tz:3   },
+  {n:"Томск",            f:"🇷🇺", lat:56.4977,  lng:84.9744,   tz:7   },
+  {n:"Оренбург",         f:"🇷🇺", lat:51.7727,  lng:55.0988,   tz:5   },
+  {n:"Кемерово",         f:"🇷🇺", lat:55.3908,  lng:86.0627,   tz:7   },
+  {n:"Новокузнецк",      f:"🇷🇺", lat:53.7557,  lng:87.1099,   tz:7   },
+  {n:"Рязань",           f:"🇷🇺", lat:54.6269,  lng:39.6916,   tz:3   },
+  {n:"Набережные Челны", f:"🇷🇺", lat:55.7435,  lng:52.3959,   tz:3   },
+  {n:"Астрахань",        f:"🇷🇺", lat:46.3497,  lng:48.0408,   tz:3   },
+  {n:"Пенза",            f:"🇷🇺", lat:53.2007,  lng:44.9984,   tz:3   },
+  {n:"Липецк",           f:"🇷🇺", lat:52.6031,  lng:39.5708,   tz:3   },
+  {n:"Тула",             f:"🇷🇺", lat:54.1961,  lng:37.6182,   tz:3   },
+  {n:"Киров",            f:"🇷🇺", lat:58.6035,  lng:49.6679,   tz:3   },
+  {n:"Чебоксары",        f:"🇷🇺", lat:56.1439,  lng:47.2489,   tz:3   },
+  {n:"Балашиха",         f:"🇷🇺", lat:55.7963,  lng:37.9383,   tz:3   },
+  {n:"Калининград",      f:"🇷🇺", lat:54.7104,  lng:20.4522,   tz:2   },
+  {n:"Брянск",           f:"🇷🇺", lat:53.2434,  lng:34.3652,   tz:3   },
+  {n:"Курск",            f:"🇷🇺", lat:51.7304,  lng:36.1927,   tz:3   },
+  {n:"Иваново",          f:"🇷🇺", lat:57.0005,  lng:40.9739,   tz:3   },
+  {n:"Магнитогорск",     f:"🇷🇺", lat:53.4072,  lng:59.0617,   tz:5   },
+  {n:"Тверь",            f:"🇷🇺", lat:56.8587,  lng:35.9176,   tz:3   },
+  {n:"Ставрополь",       f:"🇷🇺", lat:45.0428,  lng:41.9734,   tz:3   },
+  {n:"Нижний Тагил",     f:"🇷🇺", lat:57.9122,  lng:59.9799,   tz:5   },
+  {n:"Улан-Удэ",         f:"🇷🇺", lat:51.8272,  lng:107.607,   tz:8   },
+  {n:"Якутск",           f:"🇷🇺", lat:62.0397,  lng:129.733,   tz:9   },
+  {n:"Чита",             f:"🇷🇺", lat:52.0315,  lng:113.500,   tz:9   },
+  {n:"Белгород",         f:"🇷🇺", lat:50.5997,  lng:36.5858,   tz:3   },
+  {n:"Сургут",           f:"🇷🇺", lat:61.2540,  lng:73.3963,   tz:5   },
+  {n:"Владимир",         f:"🇷🇺", lat:56.1290,  lng:40.4063,   tz:3   },
+  {n:"Архангельск",      f:"🇷🇺", lat:64.5401,  lng:40.5433,   tz:3   },
+  {n:"Симферополь",      f:"🇷🇺", lat:44.9521,  lng:34.1024,   tz:3   },
+  {n:"Смоленск",         f:"🇷🇺", lat:54.7818,  lng:32.0401,   tz:3   },
+  {n:"Волжский",         f:"🇷🇺", lat:48.7878,  lng:44.7628,   tz:3   },
+  {n:"Череповец",        f:"🇷🇺", lat:59.1282,  lng:37.9019,   tz:3   },
+  {n:"Саранск",          f:"🇷🇺", lat:54.1838,  lng:45.1749,   tz:3   },
+  {n:"Калуга",           f:"🇷🇺", lat:54.5293,  lng:36.2754,   tz:3   },
+  {n:"Мурманск",         f:"🇷🇺", lat:68.9585,  lng:33.0827,   tz:3   },
+  {n:"Орёл",             f:"🇷🇺", lat:52.9651,  lng:36.0785,   tz:3   },
+  {n:"Тамбов",           f:"🇷🇺", lat:52.7212,  lng:41.4523,   tz:3   },
+  {n:"Стерлитамак",      f:"🇷🇺", lat:53.6241,  lng:55.9317,   tz:5   },
+  {n:"Грозный",          f:"🇷🇺", lat:43.3176,  lng:45.6986,   tz:3   },
+  {n:"Кострома",         f:"🇷🇺", lat:57.7677,  lng:40.9269,   tz:3   },
+  {n:"Комсомольск-на-Амуре", f:"🇷🇺", lat:50.5500, lng:137.006, tz:10 },
+  {n:"Петрозаводск",     f:"🇷🇺", lat:61.7849,  lng:34.3469,   tz:3   },
+  {n:"Сыктывкар",        f:"🇷🇺", lat:61.6688,  lng:50.8364,   tz:3   },
+  {n:"Вологда",          f:"🇷🇺", lat:59.2239,  lng:39.8845,   tz:3   },
+  {n:"Нальчик",          f:"🇷🇺", lat:43.4846,  lng:43.6069,   tz:3   },
+  {n:"Йошкар-Ола",       f:"🇷🇺", lat:56.6344,  lng:47.8977,   tz:3   },
+  {n:"Нижневартовск",    f:"🇷🇺", lat:60.9344,  lng:76.5535,   tz:5   },
+  {n:"Новороссийск",     f:"🇷🇺", lat:44.7230,  lng:37.7688,   tz:3   },
+  {n:"Шахты",            f:"🇷🇺", lat:47.7081,  lng:40.2155,   tz:3   },
+  {n:"Дзержинск",        f:"🇷🇺", lat:56.2344,  lng:43.4614,   tz:3   },
+  {n:"Нижнекамск",       f:"🇷🇺", lat:55.6380,  lng:51.8182,   tz:3   },
+  {n:"Орск",             f:"🇷🇺", lat:51.2293,  lng:58.4707,   tz:5   },
+  {n:"Анапа",            f:"🇷🇺", lat:44.8938,  lng:37.3185,   tz:3   },
+  {n:"Курган",           f:"🇷🇺", lat:55.4408,  lng:65.3411,   tz:5   },
+  {n:"Псков",            f:"🇷🇺", lat:57.8192,  lng:28.3319,   tz:3   },
+  {n:"Благовещенск",     f:"🇷🇺", lat:50.2907,  lng:127.527,   tz:9   },
+  {n:"Великий Новгород", f:"🇷🇺", lat:58.5213,  lng:31.2750,   tz:3   },
+  {n:"Ярославль",        f:"🇷🇺", lat:57.6261,  lng:39.8845,   tz:3   },
+  {n:"Ангарск",          f:"🇷🇺", lat:52.5386,  lng:103.888,   tz:8   },
+  {n:"Старый Оскол",     f:"🇷🇺", lat:51.2987,  lng:37.8421,   tz:3   },
+  {n:"Энгельс",          f:"🇷🇺", lat:51.4985,  lng:46.1245,   tz:3   },
+  {n:"Рыбинск",          f:"🇷🇺", lat:58.0446,  lng:38.8581,   tz:3   },
+  {n:"Балаково",         f:"🇷🇺", lat:52.0208,  lng:47.7968,   tz:3   },
+  {n:"Мытищи",           f:"🇷🇺", lat:55.9107,  lng:37.7296,   tz:3   },
+  {n:"Подольск",         f:"🇷🇺", lat:55.4304,  lng:37.5443,   tz:3   },
+  {n:"Химки",            f:"🇷🇺", lat:55.8889,  lng:37.4297,   tz:3   },
+  {n:"Люберцы",          f:"🇷🇺", lat:55.6780,  lng:37.8919,   tz:3   },
+  {n:"Электросталь",     f:"🇷🇺", lat:55.7889,  lng:38.4432,   tz:3   },
+  {n:"Коломна",          f:"🇷🇺", lat:55.0816,  lng:38.7799,   tz:3   },
+  {n:"Сергиев Посад",    f:"🇷🇺", lat:56.3101,  lng:38.1351,   tz:3   },
+  {n:"Таганрог",         f:"🇷🇺", lat:47.2089,  lng:38.9367,   tz:3   },
+  {n:"Копейск",          f:"🇷🇺", lat:55.1175,  lng:61.6235,   tz:5   },
+  {n:"Прокопьевск",      f:"🇷🇺", lat:53.8833,  lng:86.7167,   tz:7   },
+  {n:"Волгодонск",       f:"🇷🇺", lat:47.5123,  lng:42.1535,   tz:3   },
+  {n:"Абакан",           f:"🇷🇺", lat:53.7212,  lng:91.4420,   tz:7   },
+  {n:"Петропавловск-Камчатский", f:"🇷🇺", lat:53.0452, lng:158.651, tz:12 },
+  {n:"Южно-Сахалинск",   f:"🇷🇺", lat:46.9597,  lng:142.738,   tz:11  },
+  {n:"Находка",          f:"🇷🇺", lat:42.8257,  lng:132.874,   tz:10  },
+  {n:"Уссурийск",        f:"🇷🇺", lat:43.7980,  lng:131.950,   tz:10  },
+  {n:"Армавир",          f:"🇷🇺", lat:44.9896,  lng:41.1216,   tz:3   },
+  {n:"Рубцовск",         f:"🇷🇺", lat:51.5004,  lng:81.2003,   tz:7   },
+  {n:"Майкоп",           f:"🇷🇺", lat:44.6098,  lng:40.1069,   tz:3   },
+  {n:"Пятигорск",        f:"🇷🇺", lat:44.0496,  lng:43.0578,   tz:3   },
+  {n:"Нефтеюганск",      f:"🇷🇺", lat:61.1019,  lng:72.5983,   tz:5   },
+  {n:"Братск",           f:"🇷🇺", lat:56.1518,  lng:101.634,   tz:8   },
+  {n:"Бийск",            f:"🇷🇺", lat:52.5400,  lng:85.2159,   tz:7   },
+  {n:"Киев",             f:"🇺🇦", lat:50.4501,  lng:30.5234,   tz:2   },
+  {n:"Харьков",          f:"🇺🇦", lat:49.9935,  lng:36.2304,   tz:2   },
+  {n:"Одесса",           f:"🇺🇦", lat:46.4825,  lng:30.7233,   tz:2   },
+  {n:"Днепр",            f:"🇺🇦", lat:48.4647,  lng:35.0462,   tz:2   },
+  {n:"Львов",            f:"🇺🇦", lat:49.8397,  lng:24.0297,   tz:2   },
+  {n:"Минск",            f:"🇧🇾", lat:53.9045,  lng:27.5615,   tz:3   },
+  {n:"Гомель",           f:"🇧🇾", lat:52.4345,  lng:30.9754,   tz:3   },
+  {n:"Алматы",           f:"🇰🇿", lat:43.2220,  lng:76.8512,   tz:6   },
+  {n:"Астана",           f:"🇰🇿", lat:51.1801,  lng:71.4460,   tz:6   },
+  {n:"Ташкент",          f:"🇺🇿", lat:41.2995,  lng:69.2401,   tz:5   },
+  {n:"Самарканд",        f:"🇺🇿", lat:39.6542,  lng:66.9597,   tz:5   },
+  {n:"Баку",             f:"🇦🇿", lat:40.4093,  lng:49.8671,   tz:4   },
+  {n:"Ереван",           f:"🇦🇲", lat:40.1872,  lng:44.5152,   tz:4   },
+  {n:"Тбилиси",          f:"🇬🇪", lat:41.6938,  lng:44.8015,   tz:4   },
+  {n:"Кишинёв",          f:"🇲🇩", lat:47.0105,  lng:28.8638,   tz:2   },
+  {n:"Душанбе",          f:"🇹🇯", lat:38.5598,  lng:68.7870,   tz:5   },
+  {n:"Бишкек",           f:"🇰🇬", lat:42.8746,  lng:74.5698,   tz:6   },
+  {n:"Ашхабад",          f:"🇹🇲", lat:37.9601,  lng:58.3261,   tz:5   },
+  {n:"Таллин",           f:"🇪🇪", lat:59.4370,  lng:24.7536,   tz:2   },
+  {n:"Рига",             f:"🇱🇻", lat:56.9460,  lng:24.1059,   tz:2   },
+  {n:"Вильнюс",          f:"🇱🇹", lat:54.6872,  lng:25.2797,   tz:2   },
+  {n:"Лондон",           f:"🇬🇧", lat:51.5074,  lng:-0.1278,   tz:0   },
+  {n:"Берлин",           f:"🇩🇪", lat:52.5200,  lng:13.4050,   tz:1   },
+  {n:"Париж",            f:"🇫🇷", lat:48.8566,  lng:2.3522,    tz:1   },
+  {n:"Рим",              f:"🇮🇹", lat:41.9028,  lng:12.4964,   tz:1   },
+  {n:"Мадрид",           f:"🇪🇸", lat:40.4168,  lng:-3.7038,   tz:1   },
+  {n:"Варшава",          f:"🇵🇱", lat:52.2297,  lng:21.0122,   tz:1   },
+  {n:"Прага",            f:"🇨🇿", lat:50.0755,  lng:14.4378,   tz:1   },
+  {n:"Вена",             f:"🇦🇹", lat:48.2082,  lng:16.3738,   tz:1   },
+  {n:"Стамбул",          f:"🇹🇷", lat:41.0082,  lng:28.9784,   tz:3   },
+  {n:"Амстердам",        f:"🇳🇱", lat:52.3676,  lng:4.9041,    tz:1   },
+  {n:"Стокгольм",        f:"🇸🇪", lat:59.3293,  lng:18.0686,   tz:1   },
+  {n:"Хельсинки",        f:"🇫🇮", lat:60.1699,  lng:24.9384,   tz:2   },
+  {n:"Афины",            f:"🇬🇷", lat:37.9838,  lng:23.7275,   tz:2   },
+  {n:"Бухарест",         f:"🇷🇴", lat:44.4268,  lng:26.1025,   tz:2   },
+  {n:"Будапешт",         f:"🇭🇺", lat:47.4979,  lng:19.0402,   tz:1   },
+  {n:"Лиссабон",         f:"🇵🇹", lat:38.7223,  lng:-9.1393,   tz:0   },
+  {n:"Дубай",            f:"🇦🇪", lat:25.2048,  lng:55.2708,   tz:4   },
+  {n:"Тель-Авив",        f:"🇮🇱", lat:32.0853,  lng:34.7818,   tz:2   },
+  {n:"Бангкок",          f:"🇹🇭", lat:13.7563,  lng:100.502,   tz:7   },
+  {n:"Токио",            f:"🇯🇵", lat:35.6762,  lng:139.650,   tz:9   },
+  {n:"Пекин",            f:"🇨🇳", lat:39.9042,  lng:116.407,   tz:8   },
+  {n:"Шанхай",           f:"🇨🇳", lat:31.2304,  lng:121.474,   tz:8   },
+  {n:"Сеул",             f:"🇰🇷", lat:37.5665,  lng:126.978,   tz:9   },
+  {n:"Мумбаи",           f:"🇮🇳", lat:19.0760,  lng:72.8777,   tz:5.5 },
+  {n:"Нью-Дели",         f:"🇮🇳", lat:28.6139,  lng:77.2090,   tz:5.5 },
+  {n:"Сингапур",         f:"🇸🇬", lat:1.3521,   lng:103.820,   tz:8   },
+  {n:"Нью-Йорк",         f:"🇺🇸", lat:40.7128,  lng:-74.006,   tz:-5  },
+  {n:"Лос-Анджелес",     f:"🇺🇸", lat:34.0522,  lng:-118.244,  tz:-8  },
+  {n:"Чикаго",           f:"🇺🇸", lat:41.8781,  lng:-87.630,   tz:-6  },
+  {n:"Майами",           f:"🇺🇸", lat:25.7617,  lng:-80.192,   tz:-5  },
+  {n:"Торонто",          f:"🇨🇦", lat:43.6532,  lng:-79.383,   tz:-5  },
+  {n:"Ванкувер",         f:"🇨🇦", lat:49.2827,  lng:-123.121,  tz:-8  },
+  {n:"Буэнос-Айрес",     f:"🇦🇷", lat:-34.6037, lng:-58.382,   tz:-3  },
+  {n:"Сан-Паулу",        f:"🇧🇷", lat:-23.5505, lng:-46.633,   tz:-3  },
+  {n:"Мехико",           f:"🇲🇽", lat:19.4326,  lng:-99.133,   tz:-6  },
+  {n:"Сидней",           f:"🇦🇺", lat:-33.8688, lng:151.209,   tz:11  },
+  {n:"Мельбурн",         f:"🇦🇺", lat:-37.8136, lng:144.963,   tz:11  },
+];
+
+// ════════════════════════════════════════
+//  CITY SEARCH UI
+// ════════════════════════════════════════
+let selCity = CITIES[0]; // Москва
+let hlIdx   = -1;
+const qEl   = document.getElementById('city-q');
+const dropEl= document.getElementById('city-drop');
+const flagEl= document.getElementById('sel-flag');
+const coordEl=document.getElementById('coord-b');
+
+function applyCity(c) {
+  selCity = c;
+  qEl.value  = c.n;
+  flagEl.textContent = c.f;
+  const ld = c.lat>=0?'N':'S', ll = c.lng>=0?'E':'W';
+  const ts = c.tz>=0?'+':'';
+  coordEl.textContent = `${Math.abs(c.lat).toFixed(2)}°${ld} · ${Math.abs(c.lng).toFixed(2)}°${ll} · UTC${ts}${c.tz}`;
+  document.getElementById('c-lat').value = c.lat;
+  document.getElementById('c-lng').value = c.lng;
+  document.getElementById('c-tz').value  = c.tz;
+  document.getElementById('c-name').value= c.n;
+}
+// Поле пустое по умолчанию
+qEl.value = '';
+flagEl.textContent = '🌍';
+coordEl.textContent = '';
+
+function filterC(q) {
+  if (!q) return CITIES.slice(0,12);
+  const lq = q.toLowerCase();
+  return CITIES.filter(c=>c.n.toLowerCase().includes(lq)).slice(0,14);
+}
+
+function renderDrop(list) {
+  dropEl.innerHTML=''; hlIdx=-1;
+  if (!list.length) { dropEl.classList.remove('open'); return; }
+  list.forEach((c,i) => {
+    const d = document.createElement('div');
+    d.className='city-opt';
+    const ts=c.tz>=0?'+':'';
+    d.innerHTML=`<span class="cf">${c.f}</span><span class="cn">${c.n}</span><span class="ct">UTC${ts}${c.tz}</span>`;
+    d.addEventListener('mousedown',e=>{e.preventDefault();applyCity(c);dropEl.classList.remove('open');});
+    dropEl.appendChild(d);
+  });
+  dropEl.classList.add('open');
+}
+
+qEl.addEventListener('input', ()=>renderDrop(filterC(qEl.value)));
+qEl.addEventListener('focus', ()=>renderDrop(filterC(qEl.value)));
+qEl.addEventListener('blur',  ()=>setTimeout(()=>dropEl.classList.remove('open'),200));
+qEl.addEventListener('keydown',e=>{
+  const opts=dropEl.querySelectorAll('.city-opt');
+  if(e.key==='ArrowDown') hlIdx=Math.min(hlIdx+1,opts.length-1);
+  else if(e.key==='ArrowUp') hlIdx=Math.max(hlIdx-1,0);
+  else if(e.key==='Enter'&&hlIdx>=0){
+    const name=opts[hlIdx].querySelector('.cn').textContent;
+    const c=CITIES.find(x=>x.n===name); if(c){applyCity(c);dropEl.classList.remove('open');} e.preventDefault(); return;
+  } else if(e.key==='Escape'){dropEl.classList.remove('open');return;}
+  opts.forEach((o,i)=>o.classList.toggle('hl',i===hlIdx));
+  if(opts[hlIdx]) opts[hlIdx].scrollIntoView({block:'nearest'});
+});
+
+// ════════════════════════════════════════
+//  STARS CANVAS
+// ════════════════════════════════════════
+(function(){
+  const c=document.getElementById('cosmos'), ctx=c.getContext('2d');
+  let stars=[];
+  function resize(){c.width=innerWidth;c.height=innerHeight;buildStars();}
+  function buildStars(){
+    stars=[];
+    const n=Math.min(Math.floor(c.width*c.height/3000),520);
+    for(let i=0;i<n;i++) stars.push({
+      x:Math.random()*c.width, y:Math.random()*c.height,
+      r:Math.random()*1.5+0.15, a:Math.random()*.5+.1,
+      phase:Math.random()*Math.PI*2, sp:Math.random()*.009+.003,
+      hue:Math.floor(Math.random()*70+195),
+    });
+  }
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,c.width,c.height);
+    const g=ctx.createRadialGradient(c.width*.45,c.height*.28,0,c.width*.5,c.height*.5,c.width*.92);
+    g.addColorStop(0,'#131338'); g.addColorStop(.45,'#080818'); g.addColorStop(1,'#030308');
+    ctx.fillStyle=g; ctx.fillRect(0,0,c.width,c.height);
+    t+=.013;
+    stars.forEach(s=>{
+      const a=s.a*(.5+.5*Math.sin(t*s.sp*80+s.phase));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`hsla(${s.hue},62%,90%,${a})`; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize',resize); resize(); draw();
+})();
+
+// ════════════════════════════════════════
+//  ASTRONOMY
+// ════════════════════════════════════════
+function jd(y,m,d,h){
+  if(m<=2){y--;m+=12;}
+  const A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+h/24+B-1524.5;
+}
+
+function sunLon(jd){
+  const n=jd-2451545,L=(280.46646+.9856474*n)%360,g=(357.52911+.98560028*n)*Math.PI/180;
+  return ((L+1.914602*Math.sin(g)+.019993*Math.sin(2*g)+.000289*Math.sin(3*g))%360+360)%360;
+}
+
+function moonLon(jd,latD,lngD){
+  const T=(jd-2451545)/36525;
+  const Lp=218.3164477+481267.88123421*T-.0015786*T*T+T*T*T/538841-T*T*T*T/65194000;
+  const M =357.5291092+35999.0502909*T -.0001536*T*T+T*T*T/24490000;
+  const Mp=134.9633964+477198.8675055*T+.0087414*T*T+T*T*T/69699-T*T*T*T/14712000;
+  const F =93.2720950 +483202.0175233*T-.0036539*T*T-T*T*T/3526000+T*T*T*T/863310000;
+  const D =297.8501921+445267.1114034*T-.0018819*T*T+T*T*T/545868-T*T*T*T/113065000;
+  const r=x=>((x%360)*Math.PI/180);
+  let dL=0;
+  dL+=6288774*Math.sin(r(Mp));
+  dL+=1274027*Math.sin(r(2*D-Mp));
+  dL+= 658314*Math.sin(r(2*D));
+  dL+= 213618*Math.sin(r(2*Mp));
+  dL+=-185116*Math.sin(r(M));
+  dL+=-114332*Math.sin(r(2*F));
+  dL+=  58793*Math.sin(r(2*D-2*Mp));
+  dL+=  57066*Math.sin(r(2*D-M-Mp));
+  dL+=  53322*Math.sin(r(2*D+Mp));
+  dL+=  45758*Math.sin(r(2*D-M));
+  dL+= -40923*Math.sin(r(Mp-M));
+  dL+= -34720*Math.sin(r(D));
+  dL+= -30383*Math.sin(r(Mp+M));
+  dL+=  15327*Math.sin(r(2*D-2*F));
+  dL+= -12528*Math.sin(r(Mp+2*F));
+  dL+=  10980*Math.sin(r(Mp-2*F));
+  dL+=  10675*Math.sin(r(4*D-Mp));
+  dL+=  10034*Math.sin(r(3*Mp));
+  dL+=   8548*Math.sin(r(4*D-2*Mp));
+  dL+=  -7888*Math.sin(r(2*D+M-Mp));
+  dL+=  -6766*Math.sin(r(2*D+M));
+  dL+=  -5163*Math.sin(r(D-Mp));
+  dL+=  -4987*Math.sin(r(M+D));
+  dL+=  -4036*Math.sin(r(2*D+Mp-M));
+  dL+=   3994*Math.sin(r(2*D+2*Mp));
+  dL+=   3861*Math.sin(r(4*D));
+  dL+=   3665*Math.sin(r(2*D-3*Mp));
+  dL+=  -2689*Math.sin(r(2*Mp-M));
+  dL+=  -2602*Math.sin(r(2*D-Mp+2*F));
+  let lambda=Lp+dL/1e6;
+  // Топоцентрическая поправка (горизонтальный параллакс ~0.95°)
+  const GMST=(280.46061837+360.98564736629*(jd-2451545))%360;
+  const LST=(GMST+lngD+360)%360;
+  const HA=(LST-lambda+360)%360;
+  lambda+=-0.9507*Math.cos(latD*Math.PI/180)*Math.sin(HA*Math.PI/180);
+  return ((lambda%360)+360)%360;
+}
+
+function lonToSign(l){
+  const i=Math.floor(((l%360)+360)%360/30);
+  return [
+    {n:'Овен',e:'♈',g:'Овна'},
+    {n:'Телец',e:'♉',g:'Тельца'},
+    {n:'Близнецы',e:'♊',g:'Близнецов'},
+    {n:'Рак',e:'♋',g:'Рака'},
+    {n:'Лев',e:'♌',g:'Льва'},
+    {n:'Дева',e:'♍',g:'Девы'},
+    {n:'Весы',e:'♎',g:'Весов'},
+    {n:'Скорпион',e:'♏',g:'Скорпиона'},
+    {n:'Стрелец',e:'♐',g:'Стрельца'},
+    {n:'Козерог',e:'♑',g:'Козерога'},
+    {n:'Водолей',e:'♒',g:'Водолея'},
+    {n:'Рыбы',e:'♓',g:'Рыб'},
+  ][i];
+}
+
+function birthSign(m,d){
+  const x=m*100+d;
+  if(x>=1222||x<=119) return {n:'Козерог',e:'♑',g:'Козерога'};
+  if(x>=120&&x<=218)  return {n:'Водолей',e:'♒',g:'Водолея'};
+  if(x>=219&&x<=320)  return {n:'Рыбы',e:'♓',g:'Рыб'};
+  if(x>=321&&x<=419)  return {n:'Овен',e:'♈',g:'Овна'};
+  if(x>=420&&x<=520)  return {n:'Телец',e:'♉',g:'Тельца'};
+  if(x>=521&&x<=620)  return {n:'Близнецы',e:'♊',g:'Близнецов'};
+  if(x>=621&&x<=722)  return {n:'Рак',e:'♋',g:'Рака'};
+  if(x>=723&&x<=822)  return {n:'Лев',e:'♌',g:'Льва'};
+  if(x>=823&&x<=922)  return {n:'Дева',e:'♍',g:'Девы'};
+  if(x>=923&&x<=1022) return {n:'Весы',e:'♎',g:'Весов'};
+  if(x>=1023&&x<=1121)return {n:'Скорпион',e:'♏',g:'Скорпиона'};
+  return {n:'Стрелец',e:'♐',g:'Стрельца'};
+}
+
+// ════════════════════════════════════════
+//  INTERPRETATIONS
+// ════════════════════════════════════════
+const TR={
+  'Овен':    {el:'огня',    kw:'инициатив и лидерства'},
+  'Телец':   {el:'земли',   kw:'стабильности и накоплений'},
+  'Близнецы':{el:'воздуха', kw:'общения и обмена идеями'},
+  'Рак':     {el:'воды',    kw:'эмоций и семьи'},
+  'Лев':     {el:'огня',    kw:'творчества и признания'},
+  'Дева':    {el:'земли',   kw:'анализа и совершенствования'},
+  'Весы':    {el:'воздуха', kw:'гармонии и партнёрства'},
+  'Скорпион':{el:'воды',    kw:'трансформации и глубины'},
+  'Стрелец': {el:'огня',    kw:'расширения и философии'},
+  'Козерог': {el:'земли',   kw:'структуры и достижений'},
+  'Водолей': {el:'воздуха', kw:'инноваций и свободы'},
+  'Рыбы':    {el:'воды',    kw:'интуиции и растворения'},
+};
+const MM={
+  'Овен':'импульсивность и желание немедленных решений',
+  'Телец':'тяга к комфорту и уюту',
+  'Близнецы':'потребность в общении и обмене идеями',
+  'Рак':'повышенная чувствительность и тяга к дому',
+  'Лев':'желание сиять и получать признание',
+  'Дева':'стремление к порядку и точности',
+  'Весы':'потребность в гармонии и красоте',
+  'Скорпион':'глубокие эмоции и желание раскрыть тайное',
+  'Стрелец':'оптимизм и тяга к приключениям',
+  'Козерог':'серьёзность и долгосрочный взгляд',
+  'Водолей':'нестандартность и идеализм',
+  'Рыбы':'повышенная эмпатия и мечтательность',
+};
+
+function compat(a,b){
+  if(a===b) return true;
+  const p=[['огня','воздуха'],['земли','воды']];
+  return p.some(x=>(x[0]===a&&x[1]===b)||(x[1]===a&&x[0]===b));
+}
+
+function interp(us,ss,ms){
+  const u=TR[us]||TR['Овен'];
+  const ok=compat(u.el,(TR[ss]||TR['Овен']).el);
+  const mm=MM[ms]||'переменчивость настроения';
+
+  const pros=ok?[
+    `☀ Солнце в ${ss} гармонирует с твоей стихией ${u.el} — жизненные силы на высоком уровне`,
+    `🌱 Сильный момент для начала проектов в сфере ${u.kw}`,
+    `✨ Уверенность в себе усилена — самое время для переговоров и презентаций`,
+    `🤝 Окружающие воспринимают тебя открыто и с симпатией`,
+    `🌙 Луна в ${ms} добавляет: ${mm}`,
+  ]:[
+    `🔋 День даёт силу через преодоление — это рост, а не препятствие`,
+    `🧠 Хорошее время для анализа, планирования и пересмотра целей в сфере ${u.kw}`,
+    `🌿 Методичная работа даст больший результат, чем активные прорывы`,
+    `🤫 Внутренняя работа и рефлексия сейчас ценнее внешней активности`,
+    `🌙 Луна в ${ms} открывает: ${mm}`,
+  ];
+
+  const cons=ok?[
+    `⚡ Избыток энергии рассеивает внимание — фокусируйся на главном`,
+    `🗣 Риск перегрузиться встречами и общением — береги ресурс`,
+    `😤 Уверенность легко переходит в нетерпимость — слушай других`,
+    `💤 К вечеру возможен заметный энергетический спад`,
+  ]:[
+    `😶 Солнце в ${ss} создаёт лёгкое трение с энергией ${us} — нужно чуть больше усилий`,
+    `😓 Возможны недопонимания — формулируй мысли точно`,
+    `🌀 Рассеянность и трудность с концентрацией — делай регулярные паузы`,
+    `😤 Чужие ожидания могут давить — сохраняй своё пространство`,
+    `⚠ Решения в спешке потребуют пересмотра — не торопи события`,
+  ];
+
+  const cautions=[
+    `💸 Воздержись от крупных спонтанных трат — потрать день на анализ`,
+    `🗣 В спорах слова ранят острее обычного — выбирай выражения`,
+    `😴 Не жертвуй сном ради задач — усталость накапливается незаметно`,
+    `📲 Сократи поток информации, чтобы не перегрузить нервную систему`,
+  ];
+
+  const actions=ok?[
+    `🚀 Запускай новые инициативы в области ${u.kw} — энергия поддерживает старт`,
+    `📣 Веди переговоры и презентуй идеи — харизма и убедительность усилены`,
+    `🌐 Расширяй профессиональные связи — нетворкинг принесёт плоды`,
+    `📝 Записывай идеи — вдохновение будет приходить волнами`,
+    `🧘 15–20 минут медитации или дыхательных практик зададут тон всему дню`,
+  ]:[
+    `🗂 Приведи в порядок задачи и документы — день хорош для систематизации`,
+    `📖 Учёба и освоение нового в своей сфере принесут долгосрочный результат`,
+    `🌿 Прогулка на свежем воздухе восстановит лучше, чем стимуляторы`,
+    `💌 Напиши давно откладываемое важное письмо — слова лягут правильно`,
+    `🎨 Творческое хобби снимет напряжение и откроет неожиданные решения`,
+  ];
+
+  const moods=ok?[
+    `«Сегодня звёзды движутся в твоём ритме — позволь им вести тебя вперёд»`,
+    `«Внутри тебя горит огонь, и небо сегодня — его зеркало»`,
+    `«Это твой день. Действуй из силы, а не из страха»`,
+  ]:[
+    `«Трение рождает алмазы — позволь этому дню огранить тебя»`,
+    `«Мудрость в умении ждать. Сегодня созревает то, что расцветёт завтра»`,
+    `«Остановись и прислушайся — Вселенная шепчет то, что важно именно сейчас»`,
+  ];
+
+  return {pros,cons,cautions,actions,mood:moods[Math.floor(Math.random()*moods.length)]};
+}
+
+// ════════════════════════════════════════
+//  MAIN
+// ════════════════════════════════════════
+let calc=null;
+
+function calculate(){
+  const bdEl=document.getElementById('birthdate');
+  if(!bdEl.value){
+    bdEl.style.borderColor='#c07080';
+    bdEl.focus();
+    setTimeout(()=>bdEl.style.borderColor='',2500);
+    return;
+  }
+  const cityNameVal=document.getElementById('c-name').value;
+  if(!cityNameVal){
+    const cqEl=document.getElementById('city-q');
+    cqEl.style.borderColor='#c07080';
+    cqEl.focus();
+    setTimeout(()=>cqEl.style.borderColor='',2500);
+    return;
+  }
+  const [y,m,d]=bdEl.value.split('-').map(Number);
+  const lat=parseFloat(document.getElementById('c-lat').value);
+  const lng=parseFloat(document.getElementById('c-lng').value);
+  const city=document.getElementById('c-name').value;
+
+  const now=new Date();
+  const utcH=now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600;
+  const J=jd(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),utcH);
+
+  const sunS =lonToSign(sunLon(J));
+  const moonS=lonToSign(moonLon(J,lat,lng));
+  const userS=birthSign(m,d);
+  const ip=interp(userS.n,sunS.n,moonS.n);
+  calc={userS,sunS,moonS,ip,city};
+
+  const gate=document.getElementById('gate');
+  gate.classList.add('open');
+  gate.style.animation='none'; gate.offsetHeight;
+  gate.style.animation='rise .65s cubic-bezier(0.22,1,0.36,1) both';
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('sub-c').checked=false;
+  document.getElementById('rev-btn').classList.remove('active');
+  document.getElementById('hint').classList.add('show');
+  gate.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function onCheck(){
+  const ok=document.getElementById('sub-c').checked;
+  document.getElementById('rev-btn').classList.toggle('active',ok);
+  document.getElementById('hint').classList.toggle('show',!ok);
+}
+
+function reveal(){
+  if(!document.getElementById('sub-c').checked||!calc) return;
+  const {userS,sunS,moonS,ip,city}=calc;
+  document.getElementById('t-hl').innerHTML=
+    `☀ Солнце в созвездии <em>${sunS.n}</em> &nbsp;·&nbsp; 🌙 Луна в созвездии <em>${moonS.n}</em>`;
+  document.getElementById('b-sun').textContent=`☀ Солнце · ${sunS.n}`;
+  document.getElementById('b-moon').textContent=`🌙 Луна · ${moonS.n}`;
+  document.getElementById('b-city').textContent=`📍 ${city}`;
+  document.getElementById('sign-hd').textContent=`${userS.e} Что это значит для ${userS.g}`;
+  fill('pros',ip.pros); fill('cons',ip.cons); fill('caut',ip.cautions); fill('acts',ip.actions);
+  document.getElementById('mood').textContent=ip.mood;
+  const res=document.getElementById('result');
+  res.classList.add('show');
+  res.style.animation='none'; res.offsetHeight;
+  res.style.animation='rise .8s cubic-bezier(0.22,1,0.36,1) both';
+  res.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function fill(id,items){
+  const ul=document.getElementById(id); ul.innerHTML='';
+  items.forEach(t=>{const li=document.createElement('li');li.textContent=t;ul.appendChild(li);});
+}
+</script>
+</body>
+</html>
